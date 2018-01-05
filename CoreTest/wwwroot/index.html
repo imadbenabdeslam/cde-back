@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <title></title>
+    <link rel="stylesheet" href="Project/style.css">
+</head>
+<body>
+    <div class="horizontal">
+        <div id="bg">
+            <img src="Project/background.jpg" alt="">
+        </div>
+
+        <div class="vertical" style="margin-top: 150px;">
+            <img src="Project/pika.gif" />
+        </div>
+
+        <br />
+    </div>
+    <div class="horizontal">
+        <input id="testButton" class="btn btn-base" type="button" value="Test the project" />
+    </div>
+    <script>
+    $('#testButton').click(function () {
+        var options = {
+            url: '/api/app',
+            type: 'GET',
+            dataType: 'json'
+        };
+
+        $('#testButton');
+        $('#testButton').prop('disabled', true);
+        $('#testButton').val('Testing...');
+        $('#testButton').removeClass('btn-base');
+
+        $.ajax(options)
+        .done(function (data, jqXHR) {
+            alert(data.result);
+            $('#testButton').addClass('btn-success');
+        })
+        .fail(function (jqXHR, statusText, errorThrown) {
+            alert("Oups.. Something went wrong :-(");
+            $('#testButton').addClass('btn-danger');
+        })
+        .always(function (dataOrjqXHR, textStatus, jqXHROrerrorThrown) {
+            $("input").prop('disabled', false);
+            $('#testButton').val('Test the project');
+        });
+    });
+    </script>
+</body>
+</html>
