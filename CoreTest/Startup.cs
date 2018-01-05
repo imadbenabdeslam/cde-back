@@ -16,16 +16,34 @@ namespace CoreTest
         /// </summary>
         public static IConfigurationRoot Configuration { get; set; }
 
+        public Startup(IHostingEnvironment env)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("CoreTest/appsettings.json")
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
+            // Add our database context into the IoC container.
+            var driver = Configuration["DbDriver"];
+            // Use SQLite?
+            if (driver == "sqlite")
+            {
+                services.AddDbContext<CDEContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            }
+            if (driver == "memory")
+            {
+                services.AddDbContext<CDEContext>(opt => opt.UseInMemoryDatabase(Configuration["memroyLabel"]));
+            }
+            if (driver == "mssql")
+            {
+                services.AddDbContextPool<CDEContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            }
 
-            //services.AddDbContext<CDEContext>(opt => opt.UseInMemoryDatabase("CdeList"));
-            services.AddDbContextPool<CDEContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc();
         }
 
