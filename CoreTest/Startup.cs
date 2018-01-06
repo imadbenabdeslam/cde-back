@@ -20,8 +20,7 @@ namespace CoreTest
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("CoreTest/appsettings.json") // Deployement 
-                //.AddJsonFile("appsettings.json")  // Local
+                .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
