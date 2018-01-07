@@ -25,3 +25,5 @@
 *.scc
 /bin
 /obj
+*/bin
+*/obj

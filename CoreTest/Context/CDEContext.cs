@@ -17,7 +17,25 @@ namespace CoreTest.Context
         }
 
         public DbSet<AgendaEvent> AgendaEvents { get; set; }
+        public DbSet<AdminData> AdminData { get; set; }
 
+        /// <summary>
+        /// This method is called when the model for a derived context has been initialized,
+        /// but before the model has been locked down and used to initialize the context.
+        /// The default implementation of this method does nothing, but it can be overridden
+        /// in a derived class such that the model can be further configured before it
+        /// is locked down.
+        /// </summary>
+        /// <param name="modelBuilder">The builder that defines the model for the context being created.</param>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new AgendaEventMap());
+            modelBuilder.ApplyConfiguration(new AdminDataMap());
+
+            base.OnModelCreating(modelBuilder);
+        }
+
+        #region Common
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             SetDates();
@@ -51,21 +69,6 @@ namespace CoreTest.Context
         }
 
         /// <summary>
-        /// This method is called when the model for a derived context has been initialized,
-        /// but before the model has been locked down and used to initialize the context.
-        /// The default implementation of this method does nothing, but it can be overridden
-        /// in a derived class such that the model can be further configured before it
-        /// is locked down.
-        /// </summary>
-        /// <param name="modelBuilder">The builder that defines the model for the context being created.</param>
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.ApplyConfiguration(new AgendaEventMap());
-
-            base.OnModelCreating(modelBuilder);
-        }
-
-        /// <summary>
         /// Returns a System.Data.Entity.DbSet instance for access to entities
         /// of the given type in the context and the underlying store.
         /// </summary>
@@ -74,7 +77,7 @@ namespace CoreTest.Context
         public virtual DbSet<TEntity> EntitySet<TEntity>() where TEntity : class
         {
             return this.Set<TEntity>();
-        }
+        } 
 
         public void Rollback()
         {
@@ -97,5 +100,6 @@ namespace CoreTest.Context
                 entry.State = EntityState.Unchanged;
             }
         }
+        #endregion
     }
 }

@@ -12,11 +12,12 @@ namespace CoreTest.Controllers
 {
     [Produces("application/json")]
     [Route("api/AgendaEvents")]
-    public class AgendaEventsController : Controller
+    public class AgendaEventsController : BaseController
     {
         private readonly CDEContext _context;
 
         public AgendaEventsController(CDEContext context)
+            : base(context)
         {
             _context = context;
         }
@@ -28,13 +29,19 @@ namespace CoreTest.Controllers
             return _context.AgendaEvents;
         }
 
+        [HttpGet]
+        public IEnumerable<AgendaEvent> GetLatestEvents()
+        {
+            return _context.AgendaEvents.TakeLast(3);
+        }
+
         // GET: api/AgendaEvents/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAgendaEvent([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
+            if (base.IsAuthorized() == false)
             {
-                return BadRequest(ModelState);
+                return Unauthorized();
             }
 
             var agendaEvent = await _context.AgendaEvents.SingleOrDefaultAsync(m => m.Id == id);
@@ -51,9 +58,9 @@ namespace CoreTest.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAgendaEvent([FromRoute] int id, [FromBody] AgendaEvent agendaEvent)
         {
-            if (!ModelState.IsValid)
+            if (base.IsAuthorized() == false)
             {
-                return BadRequest(ModelState);
+                return Unauthorized();
             }
 
             if (id != agendaEvent.Id)
@@ -86,9 +93,9 @@ namespace CoreTest.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAgendaEvent([FromBody] AgendaEvent agendaEvent)
         {
-            if (!ModelState.IsValid)
+            if (base.IsAuthorized() == false)
             {
-                return BadRequest(ModelState);
+                return Unauthorized();
             }
 
             _context.AgendaEvents.Add(agendaEvent);
@@ -103,9 +110,9 @@ namespace CoreTest.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAgendaEvent([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
+            if (base.IsAuthorized() == false)
             {
-                return BadRequest(ModelState);
+                return Unauthorized();
             }
 
             var agendaEvent = await _context.AgendaEvents.SingleOrDefaultAsync(m => m.Id == id);

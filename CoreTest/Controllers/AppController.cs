@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CoreTest.Context;
+﻿using CoreTest.Context;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace CoreTest.Controllers
 {
     [Route("api/[controller]")]
-    public class AppController : Controller
+    public class AppController : BaseController
     {
         private readonly CDEContext _context;
 
         public AppController(CDEContext context)
+            : base(context)
         {
             _context = context;
         }
@@ -25,7 +23,7 @@ namespace CoreTest.Controllers
                 var list = _context.AgendaEvents.FirstOrDefault();
             }
 
-            return Ok(new { Result = " Everything is up and running !!" });
+            return Ok(new { Result = " Everything is up and running !!", IsAuthorized = base.IsAuthorized() });
         }
     }
 }
