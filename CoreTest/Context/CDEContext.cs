@@ -18,6 +18,7 @@ namespace CoreTest.Context
 
         public DbSet<AgendaEvent> AgendaEvents { get; set; }
         public DbSet<AdminData> AdminData { get; set; }
+        public DbSet<Article> Articles { get; set; }
 
         /// <summary>
         /// This method is called when the model for a derived context has been initialized,
@@ -31,6 +32,7 @@ namespace CoreTest.Context
         {
             modelBuilder.ApplyConfiguration(new AgendaEventMap());
             modelBuilder.ApplyConfiguration(new AdminDataMap());
+            modelBuilder.ApplyConfiguration(new ArticleMap());
 
             base.OnModelCreating(modelBuilder);
         }

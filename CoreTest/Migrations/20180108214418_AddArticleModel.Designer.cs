@@ -12,9 +12,10 @@ using System;
 namespace CoreTest.Migrations
 {
     [DbContext(typeof(CDEContext))]
-    partial class CDEContextModelSnapshot : ModelSnapshot
+    [Migration("20180108214418_AddArticleModel")]
+    partial class AddArticleModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

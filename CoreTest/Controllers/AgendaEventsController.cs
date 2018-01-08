@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CoreTest.Context;
 using CoreTest.Models.Entities;
+using CoreTest.Models;
 
 namespace CoreTest.Controllers
 {
@@ -24,8 +25,13 @@ namespace CoreTest.Controllers
 
         // GET: api/AgendaEvents
         [HttpGet]
-        public IEnumerable<AgendaEvent> GetAgendaEvents()
+        public IEnumerable<AgendaEvent> GetAgendaEvents([FromRoute]BaseFilter  filter)
         {
+            if (filter != null)
+            {
+                return _context.AgendaEvents.Skip(filter.Page * filter.CountPerPage).Take(filter.CountPerPage);
+            }
+
             return _context.AgendaEvents;
         }
 
