@@ -35,7 +35,7 @@ namespace CoreTest.Controllers
             return _context.AgendaEvents;
         }
 
-        [HttpGet]
+        [HttpGet, Route("GetLatest")]
         public IEnumerable<AgendaEvent> GetLatestEvents()
         {
             return _context.AgendaEvents.TakeLast(3);
