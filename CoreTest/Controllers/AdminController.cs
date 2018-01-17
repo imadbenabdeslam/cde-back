@@ -34,7 +34,7 @@ namespace CoreTest.Controllers
 
                     _context.SaveChangesAsync();
 
-                    return Ok(new { Restult = true, Value = token });
+                    return Ok(new { Result = true, Value = token });
                 }
             }
 

@@ -24,21 +24,22 @@ namespace CoreTest.Controllers
         }
 
         // GET: api/AgendaEvents
-        [HttpGet]
-        public IEnumerable<AgendaEvent> GetAgendaEvents([FromRoute]BaseFilter  filter)
+        [HttpGet, Route("{page}/{countPerPage}")]
+        public IActionResult GetAgendaEvents(int page, int countPerPage)
         {
-            if (filter != null)
+            if (page != 0 && countPerPage != 0)
             {
-                return _context.AgendaEvents.Skip(filter.Page * filter.CountPerPage).Take(filter.CountPerPage);
+                return Ok(_context.AgendaEvents.Skip(page * countPerPage).Take(countPerPage));
             }
 
-            return _context.AgendaEvents;
+            return Ok(_context.AgendaEvents);
         }
 
         [HttpGet, Route("GetLatest")]
-        public IEnumerable<AgendaEvent> GetLatestEvents()
+        public IActionResult GetLatestEvents()
         {
-            return _context.AgendaEvents.TakeLast(3);
+            var lastT = _context.AgendaEvents.Skip(Math.Max(0, _context.AgendaEvents.Count() - 3)).Take(3);
+            return Ok(lastT);
         }
 
         // GET: api/AgendaEvents/5
