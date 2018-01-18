@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using CoreTest.Context;
+using CoreTest.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CoreTest.Context;
-using CoreTest.Models.Entities;
-using CoreTest.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CoreTest.Controllers
 {
@@ -24,22 +21,23 @@ namespace CoreTest.Controllers
         }
 
         // GET: api/Articles
-        [HttpGet]
-        public IEnumerable<Article> GetArticles([FromRoute]BaseFilter filter)
+        [HttpGet, Route("{page}/{countPerPage}")]
+        public IActionResult GetArticles(int page, int countPerPage)
         {
-            if (filter!= null)
+            if (page != 0 && countPerPage != 0)
             {
-                return _context.Articles.Skip(filter.Page * filter.CountPerPage).Take(filter.CountPerPage);
+                return Ok(_context.Articles.Skip(page * countPerPage).Take(countPerPage));
             }
 
-            return _context.Articles;
+            return Ok(_context.Articles);
         }
 
         // GET: api/Articles
         [HttpGet, Route("GetLatest")]
-        public IEnumerable<Article> GetLatestArticles()
+        public IActionResult GetLatestArticles()
         {
-            return _context.Articles.TakeLast(5);
+            var lastT = _context.Articles.Skip(Math.Max(0, _context.Articles.Count() - 5)).Take(5);
+            return Ok(lastT);
         }
 
         // GET: api/Articles/5

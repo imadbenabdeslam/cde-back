@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using CoreTest.Context;
+using CoreTest.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CoreTest.Context;
-using CoreTest.Models.Entities;
-using CoreTest.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CoreTest.Controllers
 {
