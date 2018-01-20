@@ -19,6 +19,7 @@ namespace CoreTest.Controllers
         [HttpPost, Route("Authenticate/{pwd}")]
         public IActionResult Authenticate([FromRoute]string pwd)
         {
+            try
             {
                 var adminData = _context.AdminData.FirstOrDefault();
 
@@ -34,9 +35,13 @@ namespace CoreTest.Controllers
 
                     return Ok(new { Result = true, Value = token });
                 }
-            }
 
-            return Ok(new { Result = false, Value = string.Empty});
+                return Ok(new { Result = false, Value = string.Empty });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { Result = false, Value = "Error occured : " +   ex.Message});
+            }
         }
     }
 }
