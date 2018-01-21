@@ -1,7 +1,10 @@
 ﻿using CoreTest.Context;
+using CoreTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using System;
 using System.Linq;
+using System.Net;
 
 namespace CoreTest.Controllers
 {
@@ -26,6 +29,42 @@ namespace CoreTest.Controllers
             }
             
             return false;
+        }
+
+        /// <summary>
+        /// Encapsulate the result for the typical response
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        protected IActionResult ProcessResponse(object result, Exception ex = null)
+        {
+            OperationResult apiResult = new OperationResult();
+
+            if (ex != null)
+            {
+                apiResult.ErrorMessage = BuildErrorMessage(ex);
+                apiResult.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            else
+                apiResult.Result = result;
+
+            return Ok(apiResult);
+        }
+
+        /// <summary>
+        /// Extract error message from exception
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        protected string BuildErrorMessage(Exception ex)
+        {
+            string errorMessage = ex.Message;
+
+            if (ex.InnerException != null && string.IsNullOrWhiteSpace(ex.InnerException.Message) == false)
+                errorMessage += " --- " + ex.InnerException.Message;
+
+            return errorMessage;
         }
     }
 }

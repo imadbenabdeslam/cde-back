@@ -24,111 +24,153 @@ namespace CoreTest.Controllers
         [HttpGet, Route("{page}/{countPerPage}")]
         public IActionResult GetAgendaEvents(int page, int countPerPage)
         {
-            if (page != 0 && countPerPage != 0)
+            try
             {
-                return Ok(_context.AgendaEvents.Skip(page * countPerPage).Take(countPerPage));
-            }
+                if (page != 0 && countPerPage != 0)
+                {
+                    return ProcessResponse(_context.AgendaEvents.Skip(page * countPerPage).Take(countPerPage));
+                }
 
-            return Ok(_context.AgendaEvents);
+                return ProcessResponse(_context.AgendaEvents);
+            }
+            catch (Exception ex)
+            {
+                return ProcessResponse(null, ex);
+            }
         }
 
         [HttpGet, Route("GetLatest")]
         public IActionResult GetLatestEvents()
         {
-            var lastT = _context.AgendaEvents.Skip(Math.Max(0, _context.AgendaEvents.Count() - 3)).Take(3);
-            return Ok(lastT);
+            try
+            {
+                var lastT = _context.AgendaEvents.Skip(Math.Max(0, _context.AgendaEvents.Count() - 3)).Take(3);
+                return ProcessResponse(lastT);
+            }
+            catch (Exception ex)
+            {
+                return ProcessResponse(null, ex);
+            }
         }
 
         // GET: api/AgendaEvents/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAgendaEvent([FromRoute] int id)
         {
-            if (base.IsAuthorized() == false)
+            try
             {
-                return Unauthorized();
+                if (base.IsAuthorized() == false)
+                {
+                    return Unauthorized();
+                }
+
+                var agendaEvent = await _context.AgendaEvents.SingleOrDefaultAsync(m => m.Id == id);
+
+                if (agendaEvent == null)
+                {
+                    return NotFound();
+                }
+
+                return ProcessResponse(agendaEvent);
             }
-
-            var agendaEvent = await _context.AgendaEvents.SingleOrDefaultAsync(m => m.Id == id);
-
-            if (agendaEvent == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return ProcessResponse(null, ex);
             }
-
-            return Ok(agendaEvent);
         }
 
         // PUT: api/AgendaEvents/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAgendaEvent([FromRoute] int id, [FromBody] AgendaEvent agendaEvent)
         {
-            if (base.IsAuthorized() == false)
-            {
-                return Unauthorized();
-            }
-
-            if (id != agendaEvent.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(agendaEvent).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AgendaEventExists(id))
+                if (base.IsAuthorized() == false)
                 {
-                    return NotFound();
+                    return Unauthorized();
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return NoContent();
+                if (id != agendaEvent.Id)
+                {
+                    return BadRequest();
+                }
+
+                _context.Entry(agendaEvent).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!AgendaEventExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return ProcessResponse(true);
+            }
+            catch (Exception ex)
+            {
+                return ProcessResponse(null, ex);
+            }
         }
 
         // POST: api/AgendaEvents
         [HttpPost]
         public async Task<IActionResult> PostAgendaEvent([FromBody] AgendaEvent agendaEvent)
         {
-            if (base.IsAuthorized() == false)
+            try
             {
-                return Unauthorized();
+                if (base.IsAuthorized() == false)
+                {
+                    return Unauthorized();
+                }
+
+                _context.AgendaEvents.Add(agendaEvent);
+                await _context.SaveChangesAsync();
+
+                _context.SaveChanges();
+
+                return ProcessResponse(agendaEvent.Id);
             }
-
-            _context.AgendaEvents.Add(agendaEvent);
-            await _context.SaveChangesAsync();
-
-            _context.SaveChanges();
-
-            return CreatedAtAction("GetAgendaEvent", new { id = agendaEvent.Id }, agendaEvent);
+            catch (Exception ex)
+            {
+                return ProcessResponse(null, ex);
+            }
         }
 
         // DELETE: api/AgendaEvents/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAgendaEvent([FromRoute] int id)
         {
-            if (base.IsAuthorized() == false)
+            try
             {
-                return Unauthorized();
-            }
+                if (base.IsAuthorized() == false)
+                {
+                    return Unauthorized();
+                }
 
-            var agendaEvent = await _context.AgendaEvents.SingleOrDefaultAsync(m => m.Id == id);
-            if (agendaEvent == null)
+                var agendaEvent = await _context.AgendaEvents.SingleOrDefaultAsync(m => m.Id == id);
+                if (agendaEvent == null)
+                {
+                    return NotFound();
+                }
+
+                _context.AgendaEvents.Remove(agendaEvent);
+                await _context.SaveChangesAsync();
+
+                return ProcessResponse(agendaEvent);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return ProcessResponse(null, ex);
             }
-
-            _context.AgendaEvents.Remove(agendaEvent);
-            await _context.SaveChangesAsync();
-
-            return Ok(agendaEvent);
         }
 
         private bool AgendaEventExists(int id)

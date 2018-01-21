@@ -24,112 +24,154 @@ namespace CoreTest.Controllers
         [HttpGet, Route("{page}/{countPerPage}")]
         public IActionResult GetArticles(int page, int countPerPage)
         {
-            if (page != 0 && countPerPage != 0)
+            try
             {
-                return Ok(_context.Articles.Skip(page * countPerPage).Take(countPerPage));
-            }
+                if (page != 0 && countPerPage != 0)
+                {
+                    return ProcessResponse(_context.Articles.Skip(page * countPerPage).Take(countPerPage));
+                }
 
-            return Ok(_context.Articles);
+                return ProcessResponse(_context.Articles);
+            }
+            catch (Exception ex)
+            {
+                return ProcessResponse(null, ex);
+            }
         }
 
         // GET: api/Articles
         [HttpGet, Route("GetLatest")]
         public IActionResult GetLatestArticles()
         {
-            var lastT = _context.Articles.Skip(Math.Max(0, _context.Articles.Count() - 5)).Take(5);
-            return Ok(lastT);
+            try
+            {
+                var lastT = _context.Articles.Skip(Math.Max(0, _context.Articles.Count() - 5)).Take(5);
+                return ProcessResponse(lastT);
+            }
+            catch (Exception ex)
+            {
+                return ProcessResponse(null, ex);
+            }
         }
 
         // GET: api/Articles/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetArticle([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var article = await _context.Articles.SingleOrDefaultAsync(m => m.Id == id);
+
+                if (article == null)
+                {
+                    return NotFound();
+                }
+
+                return ProcessResponse(article);
             }
-
-            var article = await _context.Articles.SingleOrDefaultAsync(m => m.Id == id);
-
-            if (article == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return ProcessResponse(null, ex);
             }
-
-            return Ok(article);
         }
 
         // PUT: api/Articles/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutArticle([FromRoute] int id, [FromBody] Article article)
         {
-            if (base.IsAuthorized() == false)
-            {
-                return Unauthorized();
-            }
-
-            if (id != article.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(article).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ArticleExists(id))
+                if (base.IsAuthorized() == false)
                 {
-                    return NotFound();
+                    return Unauthorized();
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return NoContent();
+                if (id != article.Id)
+                {
+                    return BadRequest();
+                }
+
+                _context.Entry(article).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ArticleExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return ProcessResponse(true);
+            }
+            catch (Exception ex)
+            {
+                return ProcessResponse(null, ex);
+            }
         }
 
         // POST: api/Articles
         [HttpPost]
         public async Task<IActionResult> PostArticle([FromBody] Article article)
         {
-            if (base.IsAuthorized() == false)
+            try
             {
-                return Unauthorized();
+                if (base.IsAuthorized() == false)
+                {
+                    return Unauthorized();
+                }
+
+                // ToDo(ibe): May establish default value if value received null
+
+                _context.Articles.Add(article);
+                await _context.SaveChangesAsync();
+
+                return ProcessResponse(article.Id);
             }
-
-            // ToDo(ibe): May establish default value if value received null
-
-            _context.Articles.Add(article);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetArticle", new { id = article.Id }, article);
+            catch (Exception ex)
+            {
+                return ProcessResponse(null, ex);
+            }
         }
 
         // DELETE: api/Articles/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteArticle([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            var article = await _context.Articles.SingleOrDefaultAsync(m => m.Id == id);
-            if (article == null)
+                var article = await _context.Articles.SingleOrDefaultAsync(m => m.Id == id);
+                if (article == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Articles.Remove(article);
+                await _context.SaveChangesAsync();
+
+                return ProcessResponse(article);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return ProcessResponse(null, ex);
             }
-
-            _context.Articles.Remove(article);
-            await _context.SaveChangesAsync();
-
-            return Ok(article);
         }
 
         private bool ArticleExists(int id)

@@ -1,4 +1,5 @@
 ﻿using CoreTest.Context;
+using CoreTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -6,11 +7,11 @@ using System.Linq;
 namespace CoreTest.Controllers
 {
     [Route("api/admin")]
-    public class AdminController : Controller
+    public class AdminController : BaseController
     {
         private readonly CDEContext _context;
 
-        public AdminController(CDEContext context)
+        public AdminController(CDEContext context) : base(context)
         {
             _context = context;
         }
@@ -24,23 +25,23 @@ namespace CoreTest.Controllers
                 var adminData = _context.AdminData.FirstOrDefault();
 
                 if (adminData == null)
-                    return BadRequest("No value admin found in the database...");
+                    throw new Exception("No value admin found in the database...");
 
-                if (adminData.Password.Equals(pwd))
+                var token = string.Empty ;
+                var correctPwd = adminData.Password.Equals(pwd);
+                if (correctPwd)
                 {
-                    var token = Guid.NewGuid().ToString();
+                    token = Guid.NewGuid().ToString();
                     adminData.Token = token;
 
                     _context.SaveChangesAsync();
-
-                    return Ok(new { Result = true, Value = token });
                 }
 
-                return Ok(new { Result = false, Value = string.Empty });
+                return ProcessResponse(new { Result = correctPwd, Value = token });
             }
             catch (Exception ex)
             {
-                return Ok(new { Result = false, Value = "Error occured : " +   ex.Message});
+                return ProcessResponse(null, ex);
             }
         }
     }
