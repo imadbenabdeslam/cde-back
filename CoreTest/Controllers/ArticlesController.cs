@@ -60,11 +60,6 @@ namespace CoreTest.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 var article = await _context.Articles.SingleOrDefaultAsync(m => m.Id == id);
 
                 if (article == null)
@@ -152,9 +147,9 @@ namespace CoreTest.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
+                if (base.IsAuthorized() == false)
                 {
-                    return BadRequest(ModelState);
+                    return Unauthorized();
                 }
 
                 var article = await _context.Articles.SingleOrDefaultAsync(m => m.Id == id);

@@ -1,6 +1,6 @@
 ﻿using CoreTest.Context;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoreTest.Controllers
 {
@@ -19,11 +19,16 @@ namespace CoreTest.Controllers
         [HttpGet]
         public IActionResult Get()
         {
+            try
             {
-                var list = _context.AgendaEvents.FirstOrDefault();
-            }
+                _context.Database.Migrate();
 
-            return Ok(new { Result = " Everything is up and running !!", IsAuthorized = base.IsAuthorized() });
+                return ProcessResponse(new { Result = true, Message = "Migrated !", IsAuthorized = base.IsAuthorized() });
+            }
+            catch (global::System.Exception ex)
+            {
+                return ProcessResponse(new { Result = false,  ex.Message, IsAuthorized = base.IsAuthorized() });
+            }
         }
     }
 }

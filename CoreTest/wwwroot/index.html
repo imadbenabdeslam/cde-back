@@ -34,9 +34,14 @@
         $('#testButton').removeClass('btn-base');
 
         $.ajax(options)
-        .done(function (data, jqXHR) {
-            alert(data.result);
-            $('#testButton').addClass('btn-success');
+            .done(function (data, jqXHR) {
+                if (data.result.result) {
+                    $('#testButton').addClass('btn-success');
+                }
+                else {
+                    $('#testButton').addClass('btn-danger');
+                }
+                $('#testButton').val(data.result.message);
         })
         .fail(function (jqXHR, statusText, errorThrown) {
             alert("Oups.. Something went wrong :-(");
@@ -44,7 +49,6 @@
         })
         .always(function (dataOrjqXHR, textStatus, jqXHROrerrorThrown) {
             $("input").prop('disabled', false);
-            $('#testButton').val('Test the project');
         });
     });
     </script>

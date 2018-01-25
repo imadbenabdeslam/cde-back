@@ -59,11 +59,6 @@ namespace CoreTest.Controllers
         {
             try
             {
-                if (base.IsAuthorized() == false)
-                {
-                    return Unauthorized();
-                }
-
                 var agendaEvent = await _context.AgendaEvents.SingleOrDefaultAsync(m => m.Id == id);
 
                 if (agendaEvent == null)
