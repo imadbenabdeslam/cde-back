@@ -1,10 +1,13 @@
-﻿using CoreTest.Context;
+﻿using System;
+using CoreTest.Context;
+using CoreTest.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace CoreTest
@@ -44,7 +47,10 @@ namespace CoreTest
                 services.AddDbContextPool<CDEContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             }
 
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new ApiExceptionFilter());
+            });
 
             // Register the Swagger generator, defining one or more Swagger documents
             services.AddSwaggerGen(c =>
@@ -56,6 +62,11 @@ namespace CoreTest
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            SettupLogger(app, env, loggerFactory);
+
+            app.UseDeveloperExceptionPage();
+
+
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
@@ -73,6 +84,18 @@ namespace CoreTest
             );
 
             app.UseMvc();
+        }
+
+        private void SettupLogger(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
+            // Serilog configuration          
+            Log.Logger = new LoggerConfiguration()
+                    .WriteTo.RollingFile(pathFormat: "logs\\log-{Date}.log")
+                    .CreateLogger();
+
+            loggerFactory
+                .AddConsole()
+                .AddSerilog();
         }
     }
 }

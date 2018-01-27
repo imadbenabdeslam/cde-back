@@ -2,6 +2,7 @@
 using CoreTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using Serilog;
 using System;
 using System.Linq;
 using System.Net;
@@ -44,6 +45,9 @@ namespace CoreTest.Controllers
             if (ex != null)
             {
                 apiResult.ErrorMessage = BuildErrorMessage(ex);
+
+                Log.Logger.Error("BaseController.ProcessResponse -- " + apiResult.ErrorMessage);
+
                 apiResult.StatusCode = HttpStatusCode.InternalServerError;
             }
             else

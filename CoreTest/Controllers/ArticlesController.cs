@@ -1,7 +1,9 @@
 ﻿using CoreTest.Context;
+using CoreTest.Core;
 using CoreTest.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,6 +28,7 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("ArticlesController.GetArticles/{0}/{1} -- Started".Format(page, countPerPage));
                 if (page != 0 && countPerPage != 0)
                 {
                     return ProcessResponse(_context.Articles.Skip(page * countPerPage).Take(countPerPage));
@@ -35,6 +38,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error("ArticlesController.GetArticles -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
@@ -45,11 +49,13 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("ArticlesController.GetLatest -- Started");
                 var lastT = _context.Articles.Skip(Math.Max(0, _context.Articles.Count() - 5)).Take(5);
                 return ProcessResponse(lastT);
             }
             catch (Exception ex)
             {
+                Log.Error("ArticlesController.GetLatest -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
@@ -60,6 +66,7 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("ArticlesController.Get by id -- Started");
                 var article = await _context.Articles.SingleOrDefaultAsync(m => m.Id == id);
 
                 if (article == null)
@@ -71,6 +78,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error("ArticlesController.Get by id -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
@@ -81,6 +89,7 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("ArticlesController.Put -- Started");
                 if (base.IsAuthorized() == false)
                 {
                     return Unauthorized();
@@ -113,6 +122,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error("ArticlesController.Put -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
@@ -123,6 +133,7 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("ArticlesController.Post -- Started");
                 if (base.IsAuthorized() == false)
                 {
                     return Unauthorized();
@@ -137,6 +148,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error("ArticlesController.Post -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
@@ -147,6 +159,7 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("ArticlesController.Delete -- Started");
                 if (base.IsAuthorized() == false)
                 {
                     return Unauthorized();
@@ -165,6 +178,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error("ArticlesController.Delete -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }

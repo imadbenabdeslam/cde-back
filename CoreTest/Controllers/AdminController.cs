@@ -1,6 +1,7 @@
 ﻿using CoreTest.Context;
 using CoreTest.Models;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System;
 using System.Linq;
 
@@ -22,6 +23,8 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("AdminController.Authenticate -- Started with password " + pwd);
+
                 var adminData = _context.AdminData.FirstOrDefault();
 
                 if (adminData == null)
@@ -41,6 +44,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error("AdminController.Authenticate -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }

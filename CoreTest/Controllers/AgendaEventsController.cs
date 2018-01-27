@@ -1,7 +1,9 @@
 ﻿using CoreTest.Context;
+using CoreTest.Core;
 using CoreTest.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,6 +28,8 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("AgendaEventsController.GetAgendaEvents{0}/{1} -- Started".Format(page, countPerPage));
+
                 if (page != 0 && countPerPage != 0)
                 {
                     return ProcessResponse(_context.AgendaEvents.Skip(page * countPerPage).Take(countPerPage));
@@ -35,6 +39,8 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+
+                Log.Error("AgendaEventsController.GetAgendaEvents -- Error occured".Format(page, countPerPage));
                 return ProcessResponse(null, ex);
             }
         }
@@ -44,11 +50,14 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("AgendaEventsController.GetLatestEvents -- Started");
+
                 var lastT = _context.AgendaEvents.Skip(Math.Max(0, _context.AgendaEvents.Count() - 3)).Take(3);
                 return ProcessResponse(lastT);
             }
             catch (Exception ex)
             {
+                Log.Information("AgendaEventsController.GetLatestEvents -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
@@ -59,6 +68,7 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("AgendaEventsController.get by id -- Started");
                 var agendaEvent = await _context.AgendaEvents.SingleOrDefaultAsync(m => m.Id == id);
 
                 if (agendaEvent == null)
@@ -70,6 +80,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Information("AgendaEventsController.Get by id -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
@@ -80,6 +91,7 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("AgendaEventsController.Put -- Started");
                 if (base.IsAuthorized() == false)
                 {
                     return Unauthorized();
@@ -112,6 +124,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Information("AgendaEventsController.put -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
@@ -122,6 +135,7 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("AgendaEventsController.Post -- Started");
                 if (base.IsAuthorized() == false)
                 {
                     return Unauthorized();
@@ -136,6 +150,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Information("AgendaEventsController.Post -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
@@ -146,6 +161,7 @@ namespace CoreTest.Controllers
         {
             try
             {
+                Log.Information("AgendaEventsController.Delete -- Started");
                 if (base.IsAuthorized() == false)
                 {
                     return Unauthorized();
@@ -164,6 +180,7 @@ namespace CoreTest.Controllers
             }
             catch (Exception ex)
             {
+                Log.Information("AgendaEventsController.Delete -- An error occured");
                 return ProcessResponse(null, ex);
             }
         }
