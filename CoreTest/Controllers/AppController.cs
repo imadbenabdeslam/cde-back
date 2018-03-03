@@ -1,4 +1,5 @@
 ﻿using CoreTest.Context;
+using CoreTest.Core;
 using CoreTest.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,10 +29,17 @@ namespace CoreTest.Controllers
 
                 Log.Logger.Information("AppController -- Migrated DB");
 
-                if (await _context.EntitySet<AdminData>().AnyAsync() == false)
+                // ToDo(ibe): Maybe try to be authenticated
+                var adminData = await _context.EntitySet<AdminData>().FirstOrDefaultAsync();
+
+                if (adminData.IsNull())
                 {
                     Log.Logger.Information("AppController -- Add admin data because they are missing");
                     DbInitializer.Initialize(_context);
+                }
+                else
+                {
+                    DbInitializer.UpdatePwd(_context);
                 }
 
                 Log.Logger.Information("AppController -- Everything is Fine");

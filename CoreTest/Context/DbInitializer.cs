@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CoreTest.Core;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
@@ -13,11 +14,20 @@ namespace CoreTest.Context
             //context.Database.EnsureCreated();
             context.Database.Migrate();
 
-            if (context.AdminData.Any() == false)
+            if (context.AdminData.IsEmpty())
             {
-                context.AdminData.Add(new Models.Entities.AdminData() { Password = "CdeAdminPwd2018", DateCreated = DateTime.Now.ToUniversalTime(), DateModified = DateTime.Now.ToUniversalTime() });
+                context.AdminData.Add(new Models.Entities.AdminData() { Password = "CdeAdminPwd2018".GetHashString(), DateCreated = DateTime.Now.ToUniversalTime(), DateModified = DateTime.Now.ToUniversalTime() });
                 context.SaveChangesAsync();
             }
+        }
+
+        public static void UpdatePwd(CDEContext contex)
+        {
+            var adminData = contex.AdminData.FirstOrDefault();
+
+            adminData.Password = "CdeAdminPwd2018".GetHashString();
+
+            contex.SaveChanges();
         }
     }
 }

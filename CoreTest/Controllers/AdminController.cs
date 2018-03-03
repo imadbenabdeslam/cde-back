@@ -1,5 +1,5 @@
 ﻿using CoreTest.Context;
-using CoreTest.Models;
+using CoreTest.Core;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
@@ -18,12 +18,12 @@ namespace CoreTest.Controllers
         }
 
 
-        [HttpPost, Route("Authenticate/{pwd}")]
-        public IActionResult Authenticate([FromRoute]string pwd)
+        [HttpPost, Route("Authenticate")]
+        public IActionResult Authenticate([FromBody]PwdClass body)
         {
             try
             {
-                Log.Information("AdminController.Authenticate -- Started with password " + pwd);
+                Log.Information("AdminController.Authenticate -- Started with password " + body.PwdMessage);
 
                 var adminData = _context.AdminData.FirstOrDefault();
 
@@ -31,7 +31,9 @@ namespace CoreTest.Controllers
                     throw new Exception("No value admin found in the database...");
 
                 var token = string.Empty ;
-                var correctPwd = adminData.Password.Equals(pwd);
+
+                var hashedPwd = body.PwdMessage.GetHashString();
+                var correctPwd = adminData.Password.Equals(hashedPwd);
                 if (correctPwd)
                 {
                     token = Guid.NewGuid().ToString();
@@ -48,5 +50,10 @@ namespace CoreTest.Controllers
                 return ProcessResponse(null, ex);
             }
         }
+    }
+
+    public class PwdClass
+    {
+        public string PwdMessage { get; set; }
     }
 }

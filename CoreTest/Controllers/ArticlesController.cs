@@ -22,67 +22,6 @@ namespace CoreTest.Controllers
             _context = context;
         }
 
-        // GET: api/Articles
-        [HttpGet, Route("{page}/{countPerPage}")]
-        public IActionResult GetArticles(int page, int countPerPage)
-        {
-            try
-            {
-                Log.Information("ArticlesController.GetArticles/{0}/{1} -- Started".Format(page, countPerPage));
-                if (page != 0 && countPerPage != 0)
-                {
-                    return ProcessResponse(_context.Articles.Skip(page * countPerPage).Take(countPerPage));
-                }
-
-                return ProcessResponse(_context.Articles);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("ArticlesController.GetArticles -- An error occured");
-                return ProcessResponse(null, ex);
-            }
-        }
-
-        // GET: api/Articles
-        [HttpGet, Route("GetLatest")]
-        public IActionResult GetLatestArticles()
-        {
-            try
-            {
-                Log.Information("ArticlesController.GetLatest -- Started");
-                var lastT = _context.Articles.Skip(Math.Max(0, _context.Articles.Count() - 5)).Take(5);
-                return ProcessResponse(lastT);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("ArticlesController.GetLatest -- An error occured");
-                return ProcessResponse(null, ex);
-            }
-        }
-
-        // GET: api/Articles/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetArticle([FromRoute] int id)
-        {
-            try
-            {
-                Log.Information("ArticlesController.Get by id -- Started");
-                var article = await _context.Articles.SingleOrDefaultAsync(m => m.Id == id);
-
-                if (article == null)
-                {
-                    return NotFound();
-                }
-
-                return ProcessResponse(article);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("ArticlesController.Get by id -- An error occured");
-                return ProcessResponse(null, ex);
-            }
-        }
-
         // PUT: api/Articles/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutArticle([FromRoute] int id, [FromBody] Article article)

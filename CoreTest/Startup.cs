@@ -1,6 +1,11 @@
-﻿using System;
-using CoreTest.Context;
+﻿using CoreTest.Context;
 using CoreTest.Core;
+using CoreTest.Core.GraphQL;
+using CoreTest.Core.GraphQL.Types;
+using CoreTest.Repositories;
+using CoreTest.Repositories.Interfaces;
+using GraphQL;
+using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -57,16 +62,25 @@ namespace CoreTest
             {
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
             });
+
+            services.AddScoped<EasyStoreQuery>();
+            services.AddTransient<IAgendaEventRepository, AgendaEventRepository>();
+            services.AddTransient<IArticleRepository, ArticleRepository>();
+            services.AddScoped<IDocumentExecuter, DocumentExecuter>();
+            services.AddTransient<AgendaEventType>();
+            services.AddTransient<ArticleType>();
+            var sp = services.BuildServiceProvider();
+            services.AddScoped<ISchema>(_ => new EasyStoreSchema(type => (GraphType)sp.GetService(type)) { Query = sp.GetService<EasyStoreQuery>() });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            // Set up the logs
             SettupLogger(app, env, loggerFactory);
-
-            app.UseDeveloperExceptionPage();
-
-
+            
+            // Use default page (Pika)
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
@@ -80,7 +94,7 @@ namespace CoreTest
             });
 
             app.UseCors(
-                options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials()
+                options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
             );
 
             app.UseMvc();

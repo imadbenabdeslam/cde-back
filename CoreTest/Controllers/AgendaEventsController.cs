@@ -21,70 +21,7 @@ namespace CoreTest.Controllers
         {
             _context = context;
         }
-
-        // GET: api/AgendaEvents
-        [HttpGet, Route("{page}/{countPerPage}")]
-        public IActionResult GetAgendaEvents(int page, int countPerPage)
-        {
-            try
-            {
-                Log.Information("AgendaEventsController.GetAgendaEvents{0}/{1} -- Started".Format(page, countPerPage));
-
-                if (page != 0 && countPerPage != 0)
-                {
-                    return ProcessResponse(_context.AgendaEvents.Skip(page * countPerPage).Take(countPerPage));
-                }
-
-                return ProcessResponse(_context.AgendaEvents);
-            }
-            catch (Exception ex)
-            {
-
-                Log.Error("AgendaEventsController.GetAgendaEvents -- Error occured".Format(page, countPerPage));
-                return ProcessResponse(null, ex);
-            }
-        }
-
-        [HttpGet, Route("GetLatest")]
-        public IActionResult GetLatestEvents()
-        {
-            try
-            {
-                Log.Information("AgendaEventsController.GetLatestEvents -- Started");
-
-                var lastT = _context.AgendaEvents.Skip(Math.Max(0, _context.AgendaEvents.Count() - 3)).Take(3);
-                return ProcessResponse(lastT);
-            }
-            catch (Exception ex)
-            {
-                Log.Information("AgendaEventsController.GetLatestEvents -- An error occured");
-                return ProcessResponse(null, ex);
-            }
-        }
-
-        // GET: api/AgendaEvents/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetAgendaEvent([FromRoute] int id)
-        {
-            try
-            {
-                Log.Information("AgendaEventsController.get by id -- Started");
-                var agendaEvent = await _context.AgendaEvents.SingleOrDefaultAsync(m => m.Id == id);
-
-                if (agendaEvent == null)
-                {
-                    return NotFound();
-                }
-
-                return ProcessResponse(agendaEvent);
-            }
-            catch (Exception ex)
-            {
-                Log.Information("AgendaEventsController.Get by id -- An error occured");
-                return ProcessResponse(null, ex);
-            }
-        }
-
+        
         // PUT: api/AgendaEvents/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAgendaEvent([FromRoute] int id, [FromBody] AgendaEvent agendaEvent)
